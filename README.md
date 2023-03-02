@@ -189,22 +189,10 @@ spec:
     spec:
       containers:
         - name: my-service
-          image: <your-aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/my-service:latest
+          image: <your-aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/my-function:latest
           ports:
             - containerPort: 8080
-          env:
-            - name: AWS_REGION
-              value: us-east-1
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws-credentials
-                  key: access_key
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws-credentials
-                  key: secret_key
+    
 
 ```
 
