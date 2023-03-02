@@ -166,7 +166,7 @@ To deploy the application, run the following command in the root directory of yo
 
 ```bash
 serverless deploy
-
+```
 
 ## Step 11: Create a Kubernetes deployment manifest
 Create a new file named deployment.yml in the root of your service directory with the following content:
