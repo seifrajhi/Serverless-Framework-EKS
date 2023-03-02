@@ -22,6 +22,7 @@ $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.
 $ chmod +x ./aws-iam-authenticator
 $ sudo mv aws-iam-authenticator /usr/local/bin
 $ npm install -g serverless
+$ npm install --save serverless-python-requirements serverless-iam-roles-per-function serverless-ecr
 ```
 ## Step 2: Configure AWS CLI
 ```bash
@@ -116,18 +117,39 @@ docker push <account_id>.dkr.ecr.<region>.amazonaws.com/my-function:latest
 Create a file called serverless.yml in the root directory of your project and add the following code:
 
 ```yaml
-service: my-function
 provider:
   name: aws
-  runtime: python3.9
-  region: <region>
+  runtime: python3.8
+  region: eu-west-1
   stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ecr:GetAuthorizationToken
+        - ecr:BatchCheckLayerAvailability
+        - ecr:GetDownloadUrlForLayer
+        - ecr:BatchGetImage
+      Resource: '*'
   ecr:
     images:
-      my-function:
+      my-image:
         path: <account_id>.dkr.ecr.<region>.amazonaws.com/my-function:latest
         configFile: deployment.yaml
+       
+functions:
+  my-function:
+    handler: handler.lambda_handler
+    events:
+      - http:
+          path: /
+          method: get
+    image:
+      name: <ECR-repo-uri>:latest
+
 plugins:
+  - serverless-python-requirements
+  - serverless-iam-roles-per-function
+  - serverless-ecr
   - serverless-kubeless
 custom:
   kubeless:
@@ -137,7 +159,6 @@ custom:
     functionMemorySize: 128Mi
 
 ```
-Replace <region>, <account_id>, <cluster_id>, and <namespace> with the appropriate values.
 
 ## Step 10: Deploy the application
 
